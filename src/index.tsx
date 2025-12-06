@@ -307,7 +307,7 @@ export default function EmojiSelector({
     const el = scrollRef.current;
     if (!el) return;
     e.preventDefault();
-    el.scrollTop += e.deltaY;
+    el.scrollTo({ top: el.scrollTop + e.deltaY, behavior: "smooth" });
   }, []);
 
   useEffect(() => {
@@ -393,12 +393,9 @@ export default function EmojiSelector({
             >
               <Suspense
                 fallback={
-                  <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-full h-full flex items-center justify-center mt-12">
                     <div className="flex flex-col items-center gap-3">
                       <div className="animate-spin size-8 border-2 border-white/20 border-t-white/80 rounded-full"></div>
-                      <span className="text-white/60 text-sm">
-                        Loading emojis...
-                      </span>
                     </div>
                   </div>
                 }
