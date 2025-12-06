@@ -26,7 +26,7 @@ export default function SearchBar({
   return (
     <div
       data-focused={isFocused ? "true" : "false"}
-      className="bg-[#121214] items-center w-full border-1 border-[#323337] p-2 px-3 flex rounded-md data-[focused=true]:border-[#3687E9]"
+      className="bg-white/5 items-center w-full border-1 border-[#323337] p-2 px-3 flex rounded-md data-[focused=true]:border-[#3687E9]"
     >
       <input
         ref={inputRef}

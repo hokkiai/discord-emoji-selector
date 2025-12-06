@@ -111,15 +111,22 @@ const CategoryDisplay = memo(function CategoryDisplay({
   onEmojiMouseLeave: (emoji: IEmoji) => void;
   pickerId: string;
 }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const storageKey = `hokkiemojipicker-category-${category.name}-open`;
+  const [isOpen, setIsOpen] = useState(() => {
+    const cached = localStorage?.getItem(storageKey);
+    return cached === null ? true : cached === "true";
+  });
   const searchValue = useSearchValue({ pickerId });
-  useEffect(() => {
-    setIsOpen(
-      (localStorage.getItem(
-        "hokkiemojipicker-category-" + category.name + "-open"
-      ) || "true") === "true"
-    );
-  }, [category.name]);
+
+  const handleToggle = useCallback(() => {
+    setIsOpen((prev) => {
+      const newState = !prev;
+      try {
+        localStorage?.setItem(storageKey, String(newState));
+      } catch (e) {}
+      return newState;
+    });
+  }, [storageKey]);
 
   const searchLower = useMemo(
     () => (searchValue || "").toLowerCase().replace(/_/g, " "),
@@ -172,14 +179,7 @@ const CategoryDisplay = memo(function CategoryDisplay({
           "HOKKIEMOJIPICKER-categoryHeader sticky top-0 pt-2 cursor-pointer text-white px-2 flex bg-[#131416] p-1 pb-2 " +
           category.name
         }
-        onClick={() => {
-          const newOpen = !isOpen;
-          setIsOpen(newOpen);
-          localStorage.setItem(
-            "hokkiemojipicker-category-" + category.name + "-open",
-            newOpen ? "true" : "false"
-          );
-        }}
+        onClick={handleToggle}
       >
         <span className="flex gap-1.5 items-center opacity-75 hover:opacity-100">
           <span className="*:size-4.5">{categoryInfo.icon}</span>{" "}

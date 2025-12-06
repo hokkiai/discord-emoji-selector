@@ -15,7 +15,23 @@ export default function Footer({
     };
   }, []);
   return (
-    <div className="HOKKIEMOJIPICKER-footer mt-auto flex gap-2 items-center border-t-1 px-4 py-3 border-[#363639] bg-[#070709]">
+    <div className="HOKKIEMOJIPICKER-footer relative mt-auto flex gap-2 items-center px-4 py-3 bg-[#070709]">
+      <div
+        style={
+          {
+            cssText: `
+    left: 0;
+    position: absolute;
+    background-color: transparent;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    transform: translateY(-100%);
+    border-radius: 100%;
+    box-shadow: -14px 14px 0px 10px #070709;`,
+          } as any
+        }
+      />
       <div
         className="*:size-9 *:min-w-9 *:max-w-9"
         dangerouslySetInnerHTML={{ __html: render(footerEmoji.char) }}

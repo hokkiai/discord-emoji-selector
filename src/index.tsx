@@ -340,7 +340,7 @@ export default function EmojiSelector({
       >
         {showNav && (
           <div
-            className="HOKKIEMOJIPICKER-nav border-[#363639] flex items-center gap-4 border-b-1 p-3 relative z-50"
+            className="HOKKIEMOJIPICKER-nav flex items-center gap-4 p-3 relative z-50"
             style={{
               height: navHeight,
               maxHeight: navHeight,
@@ -353,7 +353,7 @@ export default function EmojiSelector({
         )}
         <div className="flex h-full">
           {showSidebar && (
-            <div className="HOKKIEMOJIPICKER-sidebar bg-[#070709]  flex p-2 gap-1 flex-col">
+            <div className="HOKKIEMOJIPICKER-sidebar rounded-t-md bg-[#070709]  flex p-2 gap-1 flex-col">
               {Object.keys(categoryData)
                 .filter((categoryName) => categoryData[categoryName] !== false)
                 .map((categoryName) => {
@@ -391,7 +391,18 @@ export default function EmojiSelector({
               }}
               className="HOKKIEMOJIPICKER-emojidisplay overflow-y-scroll bg-[#131416] h-full w-full flex flex-wrap px-2 items-start justfy-start justify-self-start gap-y-0.5"
             >
-              <Suspense fallback={<div />}>
+              <Suspense
+                fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="animate-spin size-8 border-2 border-white/20 border-t-white/80 rounded-full"></div>
+                      <span className="text-white/60 text-sm">
+                        Loading emojis...
+                      </span>
+                    </div>
+                  </div>
+                }
+              >
                 {emojis.map((category: ICategory) => {
                   if (!category) return;
                   const categoryInfo: ICategoryInfo =
