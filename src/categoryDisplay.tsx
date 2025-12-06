@@ -31,11 +31,10 @@ const Emoji = memo(function Emoji({
   const html = useMemo(() => render(emoji.char), [emoji.char]);
   return (
     <div
-      tabIndex={-1}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      className="HOKKIEMOJIPICKER-emoji text-4xl p-1 cursor-pointer hover:bg-white/15 focus:bg-white/20 rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
+      className="HOKKIEMOJIPICKER-emoji text-4xl p-1 cursor-pointer hover:bg-white/15 rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -86,11 +85,10 @@ const SkinEmoji = memo(function SkinEmoji({
   const html = useMemo(() => render(fakeEmoji.char), [fakeEmoji.char]);
   return (
     <div
-      tabIndex={-1}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      className="HOKKIEMOJIPICKER-skinemoji text-4xl p-1 cursor-pointer hover:bg-white/15 focus:bg-white/20 rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
+      className="HOKKIEMOJIPICKER-skinemoji text-4xl p-1 cursor-pointer hover:bg-white/15 rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

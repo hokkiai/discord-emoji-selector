@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CategoryDisplay from "./categoryDisplay";
-import rawemojis from "./emojilib.json";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef } from "react";
 import SearchBar from "./searchbar";
 import type { ICategory, ICategoryInfo, IEmoji } from "./types";
 import Footer from "./footer";
@@ -9,6 +7,9 @@ import SkinSelector from "./skinselector";
 import render from "./render";
 import "./styles.css";
 import { cn } from "./cn";
+import rawemojisData from "./emojilib.json";
+
+const CategoryDisplay = lazy(() => import("./categoryDisplay"));
 
 export default function EmojiSelector({
   categories = {},
@@ -56,10 +57,14 @@ export default function EmojiSelector({
   // NOTE: No usestates should be used here as it would cause a BUNCH of lag.
   // This has to be the fastest as possible.
 
-  let recentlyUsed = JSON.parse(
-    (localStorage || { getItem: (a) => "[]" }).getItem(
-      "hokkiemojipicker-recentlyused"
-    ) || "[]"
+  const recentlyUsed = useMemo(
+    () =>
+      JSON.parse(
+        (localStorage || { getItem: (a) => "[]" }).getItem(
+          "hokkiemojipicker-recentlyused"
+        ) || "[]"
+      ),
+    []
   );
   const categoryData = {
     recentlyUsed:
@@ -273,29 +278,30 @@ export default function EmojiSelector({
     },
   };
 
-  const emojis = [
-    recentlyUsed.length > 0
-      ? {
-          name: "recentlyUsed",
-          emojis: recentlyUsed,
-        }
-      : undefined,
-    (customEmojis?.emojis || []).length > 0
-      ? {
-          name: "customServerIcons",
-          emojis: customEmojis.emojis.map((a) => {
-            return { name: a.split(":")[1].split(":")[0], char: a };
-          }),
-        }
-      : undefined,
-    ...rawemojis,
-  ].filter((a) => a !== undefined);
+  const emojis = useMemo(() => {
+    return [
+      recentlyUsed.length > 0
+        ? {
+            name: "recentlyUsed",
+            emojis: recentlyUsed,
+          }
+        : undefined,
+      (customEmojis?.emojis || []).length > 0
+        ? {
+            name: "customServerIcons",
+            emojis: customEmojis.emojis.map((a) => {
+              return { name: a.split(":")[1].split(":")[0], char: a };
+            }),
+          }
+        : undefined,
+      ...rawemojisData,
+    ].filter((a) => a !== undefined);
+  }, [recentlyUsed, customEmojis]);
 
   const navHeight = showNav ? Math.floor(height / 7) : 0;
   const id = useMemo(() => Math.random().toString(36).substring(2, 15), []);
   const picker = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [focusIndex, setFocusIndex] = useState(-1);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     const el = scrollRef.current;
@@ -312,35 +318,6 @@ export default function EmojiSelector({
       el.removeEventListener("wheel", handleWheel);
     };
   }, [handleWheel]);
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const emojiElements = el.querySelectorAll<HTMLElement>(
-        ".HOKKIEMOJIPICKER-emoji, .HOKKIEMOJIPICKER-skinemoji"
-      );
-      const count = emojiElements.length;
-      if (count === 0) return;
-      if (e.key === "Tab") {
-        e.preventDefault();
-        let next = focusIndex + (e.shiftKey ? -1 : 1);
-        if (next < 0) next = count - 1;
-        if (next >= count) next = 0;
-        setFocusIndex(next);
-        const target = emojiElements[next];
-        if (target) {
-          target.scrollIntoView({ block: "nearest" });
-          target.focus();
-        }
-      } else if (e.key === "Enter" && focusIndex >= 0) {
-        e.preventDefault();
-        const target = emojiElements[focusIndex];
-        if (target) target.click();
-      }
-    },
-    [focusIndex]
-  );
 
   return (
     <div className="HOKKIEMOJIPICKER-emojiContainer">
@@ -409,45 +386,47 @@ export default function EmojiSelector({
           >
             <div
               ref={scrollRef}
-              tabIndex={0}
-              onKeyDown={handleKeyDown}
               style={{
                 flexBasis: "fit-content",
               }}
               className="HOKKIEMOJIPICKER-emojidisplay overflow-y-scroll bg-[#131416] h-full w-full flex flex-wrap px-2 items-start justfy-start justify-self-start gap-y-0.5"
             >
-              {emojis.map((category: ICategory) => {
-                if (!category) return;
-                const categoryInfo: ICategoryInfo = categoryData[category.name];
-                return (
-                  <CategoryDisplay
-                    onEmojiMouseEnter={onEmojiMouseEnter}
-                    onEmojiMouseLeave={onEmojiMouseLeave}
-                    isToneSelectorEnabled={toneSelector}
-                    onEmojiSelect={(a) => {
-                      onEmojiSelect(a);
-                      if (a.char.startsWith("<")) return;
-                      let newRecentlyUsed = JSON.parse(
-                        localStorage.getItem("hokkiemojipicker-recentlyused") ||
-                          "[]"
-                      );
-                      newRecentlyUsed = newRecentlyUsed.filter(
-                        (b: IEmoji) => b.char !== a.char
-                      );
-                      newRecentlyUsed.push(a);
-                      newRecentlyUsed = newRecentlyUsed.slice(0, 20);
-                      localStorage.setItem(
-                        "hokkiemojipicker-recentlyused",
-                        JSON.stringify(newRecentlyUsed)
-                      );
-                    }}
-                    key={category.name}
-                    category={category}
-                    pickerId={id}
-                    categoryInfo={categoryInfo}
-                  />
-                );
-              })}
+              <Suspense fallback={<div />}>
+                {emojis.map((category: ICategory) => {
+                  if (!category) return;
+                  const categoryInfo: ICategoryInfo =
+                    categoryData[category.name];
+                  return (
+                    <CategoryDisplay
+                      onEmojiMouseEnter={onEmojiMouseEnter}
+                      onEmojiMouseLeave={onEmojiMouseLeave}
+                      isToneSelectorEnabled={toneSelector}
+                      onEmojiSelect={(a) => {
+                        onEmojiSelect(a);
+                        if (a.char.startsWith("<")) return;
+                        let newRecentlyUsed = JSON.parse(
+                          localStorage.getItem(
+                            "hokkiemojipicker-recentlyused"
+                          ) || "[]"
+                        );
+                        newRecentlyUsed = newRecentlyUsed.filter(
+                          (b: IEmoji) => b.char !== a.char
+                        );
+                        newRecentlyUsed.push(a);
+                        newRecentlyUsed = newRecentlyUsed.slice(0, 20);
+                        localStorage.setItem(
+                          "hokkiemojipicker-recentlyused",
+                          JSON.stringify(newRecentlyUsed)
+                        );
+                      }}
+                      key={category.name}
+                      category={category}
+                      pickerId={id}
+                      categoryInfo={categoryInfo}
+                    />
+                  );
+                })}
+              </Suspense>
             </div>
             {showFooter && <Footer id={id} firstEmoji={emojis[0].emojis[0]} />}
           </div>
