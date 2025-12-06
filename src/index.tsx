@@ -1,4 +1,12 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import SearchBar from "./searchbar";
 import type { ICategory, ICategoryInfo, IEmoji } from "./types";
 import Footer from "./footer";
@@ -7,7 +15,6 @@ import SkinSelector from "./skinselector";
 import render from "./render";
 import "./styles.css";
 import { cn } from "./cn";
-import rawemojisData from "./emojilib.json";
 
 const CategoryDisplay = lazy(() => import("./categoryDisplay"));
 
@@ -278,6 +285,16 @@ export default function EmojiSelector({
     },
   };
 
+  const [rawemojisData, setRawemojisData] = useState<any[]>([]);
+  const [isLoadingEmojis, setIsLoadingEmojis] = useState(true);
+
+  useEffect(() => {
+    import("./emojilib.json").then((module) => {
+      setRawemojisData(module.default);
+      setIsLoadingEmojis(false);
+    });
+  }, []);
+
   const emojis = useMemo(() => {
     return [
       recentlyUsed.length > 0
@@ -296,7 +313,7 @@ export default function EmojiSelector({
         : undefined,
       ...rawemojisData,
     ].filter((a) => a !== undefined);
-  }, [recentlyUsed, customEmojis]);
+  }, [recentlyUsed, customEmojis, rawemojisData]);
 
   const navHeight = showNav ? Math.floor(height / 7) : 0;
   const id = useMemo(() => Math.random().toString(36).substring(2, 15), []);
@@ -388,7 +405,6 @@ export default function EmojiSelector({
               ref={scrollRef}
               style={{
                 flexBasis: "fit-content",
-                scrollBehavior: "smooth",
               }}
               className="HOKKIEMOJIPICKER-emojidisplay overflow-y-scroll bg-[#131416] h-full w-full flex flex-wrap px-2 items-start justfy-start justify-self-start gap-y-0.5"
             >
@@ -396,45 +412,65 @@ export default function EmojiSelector({
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="animate-spin size-8 my-6 border-2 border-white/20 border-t-white/80 rounded-full"></div>
+                      <span className="text-transparent pointer-events-none select-none text-sm opacity-0">
+                        .
+                      </span>
+                      <div className="animate-spin size-8 border-2 border-white/20 border-t-white/80 rounded-full"></div>
+                      <span className="text-transparent pointer-events-none select-none text-sm opacity-0">
+                        .
+                      </span>
                     </div>
                   </div>
                 }
               >
-                {emojis.map((category: ICategory) => {
-                  if (!category) return;
-                  const categoryInfo: ICategoryInfo =
-                    categoryData[category.name];
-                  return (
-                    <CategoryDisplay
-                      onEmojiMouseEnter={onEmojiMouseEnter}
-                      onEmojiMouseLeave={onEmojiMouseLeave}
-                      isToneSelectorEnabled={toneSelector}
-                      onEmojiSelect={(a) => {
-                        onEmojiSelect(a);
-                        if (a.char.startsWith("<")) return;
-                        let newRecentlyUsed = JSON.parse(
-                          localStorage.getItem(
-                            "hokkiemojipicker-recentlyused"
-                          ) || "[]"
-                        );
-                        newRecentlyUsed = newRecentlyUsed.filter(
-                          (b: IEmoji) => b.char !== a.char
-                        );
-                        newRecentlyUsed.push(a);
-                        newRecentlyUsed = newRecentlyUsed.slice(0, 20);
-                        localStorage.setItem(
-                          "hokkiemojipicker-recentlyused",
-                          JSON.stringify(newRecentlyUsed)
-                        );
-                      }}
-                      key={category.name}
-                      category={category}
-                      pickerId={id}
-                      categoryInfo={categoryInfo}
-                    />
-                  );
-                })}
+                {isLoadingEmojis ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="text-transparent pointer-events-none select-none text-sm opacity-0">
+                        .
+                      </span>
+                      <div className="animate-spin size-8 border-2 border-white/20 border-t-white/80 rounded-full"></div>
+                      <span className="text-transparent pointer-events-none select-none text-sm opacity-0">
+                        .
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  emojis.map((category: ICategory) => {
+                    if (!category) return;
+                    const categoryInfo: ICategoryInfo =
+                      categoryData[category.name];
+                    return (
+                      <CategoryDisplay
+                        onEmojiMouseEnter={onEmojiMouseEnter}
+                        onEmojiMouseLeave={onEmojiMouseLeave}
+                        isToneSelectorEnabled={toneSelector}
+                        onEmojiSelect={(a) => {
+                          onEmojiSelect(a);
+                          if (a.char.startsWith("<")) return;
+                          let newRecentlyUsed = JSON.parse(
+                            localStorage.getItem(
+                              "hokkiemojipicker-recentlyused"
+                            ) || "[]"
+                          );
+                          newRecentlyUsed = newRecentlyUsed.filter(
+                            (b: IEmoji) => b.char !== a.char
+                          );
+                          newRecentlyUsed.push(a);
+                          newRecentlyUsed = newRecentlyUsed.slice(0, 20);
+                          localStorage.setItem(
+                            "hokkiemojipicker-recentlyused",
+                            JSON.stringify(newRecentlyUsed)
+                          );
+                        }}
+                        key={category.name}
+                        category={category}
+                        pickerId={id}
+                        categoryInfo={categoryInfo}
+                      />
+                    );
+                  })
+                )}
               </Suspense>
             </div>
             {showFooter && <Footer id={id} firstEmoji={emojis[0].emojis[0]} />}
