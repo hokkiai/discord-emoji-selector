@@ -307,7 +307,7 @@ export default function EmojiSelector({
     const el = scrollRef.current;
     if (!el) return;
     e.preventDefault();
-    el.scrollTo({ top: el.scrollTop + e.deltaY, behavior: "smooth" });
+    el.scrollTop += e.deltaY;
   }, []);
 
   useEffect(() => {
@@ -388,14 +388,15 @@ export default function EmojiSelector({
               ref={scrollRef}
               style={{
                 flexBasis: "fit-content",
+                scrollBehavior: "smooth",
               }}
               className="HOKKIEMOJIPICKER-emojidisplay overflow-y-scroll bg-[#131416] h-full w-full flex flex-wrap px-2 items-start justfy-start justify-self-start gap-y-0.5"
             >
               <Suspense
                 fallback={
-                  <div className="w-full h-full flex items-center justify-center mt-2">
+                  <div className="w-full h-full flex items-center justify-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="animate-spin size-8 border-2 border-white/20 border-t-white/80 rounded-full"></div>
+                      <div className="animate-spin size-8 my-6 border-2 border-white/20 border-t-white/80 rounded-full"></div>
                     </div>
                   </div>
                 }
