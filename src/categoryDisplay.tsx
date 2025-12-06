@@ -1,103 +1,102 @@
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState, useCallback, useMemo } from "react";
 import render from "./render";
 import type { ICategory, ICategoryInfo, IEmoji } from "./types";
 import { useSearchValue, useSkin } from "./hooks";
 
-function Emoji({
+const Emoji = memo(function Emoji({
   pickerId,
   emoji,
   onEmojiMouseEnter,
   onEmojiMouseLeave,
   onEmojiSelect,
-  key,
 }: {
   pickerId: string;
   emoji: IEmoji;
   onEmojiMouseEnter: (emoji: IEmoji) => void;
   onEmojiMouseLeave: (emoji: IEmoji) => void;
   onEmojiSelect: (emoji: IEmoji) => void;
-  key: string;
 }) {
+  const handleMouseEnter = useCallback(() => {
+    window["emojipicker-" + pickerId].changeFooterEmoji(emoji);
+    window["emojipicker-" + pickerId].changeSearchbarPlaceholder(emoji.name);
+    onEmojiMouseEnter(emoji);
+  }, [pickerId, emoji, onEmojiMouseEnter]);
+  const handleMouseLeave = useCallback(() => {
+    onEmojiMouseLeave(emoji);
+  }, [emoji, onEmojiMouseLeave]);
+  const handleClick = useCallback(() => {
+    onEmojiSelect(emoji);
+  }, [emoji, onEmojiSelect]);
+  const html = useMemo(() => render(emoji.char), [emoji.char]);
   return (
     <div
-      onMouseEnter={() => {
-        window["emojipicker-" + pickerId].changeFooterEmoji(emoji);
-        window["emojipicker-" + pickerId].changeSearchbarPlaceholder(
-          emoji.name
-        );
-        onEmojiMouseEnter(emoji);
-      }}
-      onMouseLeave={() => {
-        onEmojiMouseLeave(emoji);
-      }}
-      onClick={() => {
-        onEmojiSelect(emoji);
-      }}
-      className="HOKKIEMOJIPICKER-emoji text-4xl p-1 cursor-pointer hover:bg-white/15  rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
-      dangerouslySetInnerHTML={{
-        __html: render(emoji.char),
-      }}
+      tabIndex={-1}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      className="HOKKIEMOJIPICKER-emoji text-4xl p-1 cursor-pointer hover:bg-white/15 focus:bg-white/20 rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   );
-}
-function SkinEmoji({
+});
+const SkinEmoji = memo(function SkinEmoji({
   pickerId,
   emoji,
   onEmojiSelect,
   onEmojiMouseEnter,
   onEmojiMouseLeave,
-  key,
 }: {
   pickerId: string;
   emoji: IEmoji;
   onEmojiSelect: (emoji: IEmoji) => void;
   onEmojiMouseEnter: (emoji: IEmoji) => void;
   onEmojiMouseLeave: (emoji: IEmoji) => void;
-  key: string;
 }) {
   const skin = useSkin({ pickerId });
-  const grabEmoji = () =>
-    [1, 2, 3, 4, 5].includes(skin)
+  const fakeEmoji: IEmoji = useMemo(() => {
+    const charForSkin = [1, 2, 3, 4, 5].includes(skin)
       ? emoji.tones.find((a) => a.tone.find((b) => b === skin) === skin)?.char
       : emoji.char;
-  const fakeEmoji: IEmoji = {
-    ...emoji,
-    char: grabEmoji(),
-    preRendered: true,
-    tones: [
-      {
-        name: emoji.tones[0].name.replaceAll("1", "0"),
-        tone: [0],
-        char: emoji.char,
-      },
-      ...emoji.tones,
-    ],
-  };
+    return {
+      ...emoji,
+      char: charForSkin,
+      preRendered: true,
+      tones: [
+        {
+          name: emoji.tones[0].name.replaceAll("1", "0"),
+          tone: [0],
+          char: emoji.char,
+        },
+        ...emoji.tones,
+      ],
+    };
+  }, [emoji, skin]);
+  const handleMouseEnter = useCallback(() => {
+    window["emojipicker-" + pickerId].changeFooterEmoji(fakeEmoji);
+    window["emojipicker-" + pickerId].changeSearchbarPlaceholder(emoji.name);
+    onEmojiMouseEnter(fakeEmoji);
+  }, [pickerId, fakeEmoji, emoji.name, onEmojiMouseEnter]);
+  const handleMouseLeave = useCallback(() => {
+    onEmojiMouseLeave(fakeEmoji);
+  }, [fakeEmoji, onEmojiMouseLeave]);
+  const handleClick = useCallback(() => {
+    onEmojiSelect(fakeEmoji);
+  }, [fakeEmoji, onEmojiSelect]);
+  const html = useMemo(() => render(fakeEmoji.char), [fakeEmoji.char]);
   return (
     <div
-      onMouseEnter={() => {
-        window["emojipicker-" + pickerId].changeFooterEmoji(fakeEmoji);
-        window["emojipicker-" + pickerId].changeSearchbarPlaceholder(
-          emoji.name
-        );
-        onEmojiMouseEnter(fakeEmoji);
-      }}
-      onMouseLeave={() => {
-        onEmojiMouseLeave(fakeEmoji);
-      }}
-      onClick={() => {
-        onEmojiSelect(fakeEmoji);
-      }}
-      className="HOKKIEMOJIPICKER-skinemoji text-4xl p-1 cursor-pointer hover:bg-white/15  rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
-      dangerouslySetInnerHTML={{
-        __html: render(fakeEmoji.char),
-      }}
+      tabIndex={-1}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      className="HOKKIEMOJIPICKER-skinemoji text-4xl p-1 cursor-pointer hover:bg-white/15 focus:bg-white/20 rounded-sm size-12.5 flex items-center justify-center overflow-hidden"
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   );
-}
+});
 
-export default function CategoryDisplay({
+const CategoryDisplay = memo(function CategoryDisplay({
   category,
   categoryInfo,
   isToneSelectorEnabled,
@@ -122,21 +121,26 @@ export default function CategoryDisplay({
         "hokkiemojipicker-category-" + category.name + "-open"
       ) || "true") === "true"
     );
-  }, []);
-  if ((searchValue || "").length > 0) {
+  }, [category.name]);
+
+  const searchLower = useMemo(
+    () => (searchValue || "").toLowerCase().replace(/_/g, " "),
+    [searchValue]
+  );
+
+  const filteredEmojis = useMemo(() => {
+    if (!searchLower) return null;
+    return category.emojis.filter((emoji) =>
+      emoji.name.toLowerCase().replace(/_/g, " ").includes(searchLower)
+    );
+  }, [category.emojis, searchLower]);
+
+  if (searchLower) {
     if (category.name === "recentlyUsed")
-      return <div className="h-1.5 w-full "></div>;
+      return <div className="h-1.5 w-full"></div>;
     return (
       <>
-        {category.emojis.map((emoji: IEmoji) => {
-          if (
-            !emoji.name
-              .toLowerCase()
-              .replace(/_/g, " ")
-              .includes(searchValue.toLowerCase().replace(/_/g, " "))
-          )
-            return <></>;
-
+        {filteredEmojis!.map((emoji: IEmoji) => {
           if (emoji.hasTone && !emoji.preRendered) {
             return (
               <SkinEmoji
@@ -222,4 +226,6 @@ export default function CategoryDisplay({
       )}
     </div>
   );
-}
+});
+
+export default CategoryDisplay;

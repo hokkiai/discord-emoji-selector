@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CategoryDisplay from "./categoryDisplay";
 import rawemojis from "./emojilib.json";
 import SearchBar from "./searchbar";
@@ -292,8 +292,55 @@ export default function EmojiSelector({
   ].filter((a) => a !== undefined);
 
   const navHeight = showNav ? Math.floor(height / 7) : 0;
-  const id = Math.random().toString(36).substring(2, 15);
+  const id = useMemo(() => Math.random().toString(36).substring(2, 15), []);
   const picker = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [focusIndex, setFocusIndex] = useState(-1);
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    e.preventDefault();
+    el.scrollTop += e.deltaY;
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+    };
+  }, [handleWheel]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const emojiElements = el.querySelectorAll<HTMLElement>(
+        ".HOKKIEMOJIPICKER-emoji, .HOKKIEMOJIPICKER-skinemoji"
+      );
+      const count = emojiElements.length;
+      if (count === 0) return;
+      if (e.key === "Tab") {
+        e.preventDefault();
+        let next = focusIndex + (e.shiftKey ? -1 : 1);
+        if (next < 0) next = count - 1;
+        if (next >= count) next = 0;
+        setFocusIndex(next);
+        const target = emojiElements[next];
+        if (target) {
+          target.scrollIntoView({ block: "nearest" });
+          target.focus();
+        }
+      } else if (e.key === "Enter" && focusIndex >= 0) {
+        e.preventDefault();
+        const target = emojiElements[focusIndex];
+        if (target) target.click();
+      }
+    },
+    [focusIndex]
+  );
 
   return (
     <div className="HOKKIEMOJIPICKER-emojiContainer">
@@ -361,6 +408,9 @@ export default function EmojiSelector({
             className="HOKKIEMOJIPICKER-emojidisplaycontainer overflow-hidden flex flex-col w-full"
           >
             <div
+              ref={scrollRef}
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
               style={{
                 flexBasis: "fit-content",
               }}
