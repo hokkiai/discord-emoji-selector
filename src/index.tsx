@@ -294,7 +294,6 @@ export default function EmojiSelector({
   const navHeight = showNav ? Math.floor(height / 7) : 0;
   const id = Math.random().toString(36).substring(2, 15);
   const picker = useRef<HTMLDivElement>(null);
-  console.log(id);
 
   return (
     <div className="HOKKIEMOJIPICKER-emojiContainer">

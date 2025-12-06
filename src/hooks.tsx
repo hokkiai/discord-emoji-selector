@@ -3,17 +3,17 @@ import { useEffect, useState } from "react";
 export function useSkin({ pickerId }: { pickerId: string }) {
   const [skin, setSkin] = useState(0);
   useEffect(() => {
-    const a = setInterval(() => {
+    let raf: number;
+    const loop = () => {
       const newSkin = window["emojipicker-" + pickerId]?.skin;
-      const oldSkin = skin;
-      if (newSkin !== oldSkin) {
-        setSkin(newSkin);
-      }
-    }, 100);
-    return () => {
-      clearInterval(a);
+      setSkin(newSkin || 0);
+      raf = requestAnimationFrame(loop);
     };
-  }, [skin]);
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+    };
+  }, [pickerId]);
 
   return skin;
 }
@@ -21,17 +21,18 @@ export function useSkin({ pickerId }: { pickerId: string }) {
 export function useSearchValue({ pickerId }: { pickerId: string }) {
   const [searchValue, setSearchValue] = useState("");
   useEffect(() => {
-    const a = setInterval(() => {
-      const newSearchValue = window["emojipicker-" + pickerId]?.searchValue;
-      const oldSearchValue = searchValue;
-      if (newSearchValue !== oldSearchValue) {
-        setSearchValue(newSearchValue);
-      }
-    }, 100);
-    return () => {
-      clearInterval(a);
+    let raf: number;
+    const loop = () => {
+      const newSearchValue =
+        window["emojipicker-" + pickerId]?.searchValue || "";
+      setSearchValue(newSearchValue);
+      raf = requestAnimationFrame(loop);
     };
-  }, [searchValue]);
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+    };
+  }, [pickerId]);
 
   return searchValue;
 }
