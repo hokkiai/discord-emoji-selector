@@ -1,3 +1,11 @@
 node_modules/
 dist/
 package-lock.json
+.npmrc
+.env
+.DS_Store
+.vscode/
+.idea/
+coverage/
+logs/
+*.log   

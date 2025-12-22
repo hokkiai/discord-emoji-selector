@@ -1,6 +1,13 @@
-# Hokki - Discord Emoji Selector
-
-A lightweight and powerful Discord-style emoji picker for React. Made by the HokkiAI Discord bot team.
+<div align="center">
+  <br>Our <b>discord emoji selector</b> is a lightweight and powerful Discord-style emoji picker for React.<br>
+  <br><a href="https://www.hokki.app/library-demos/discord-emoji-selector">Demo</a>
+  <br><br><img width="420" alt="Discord Emoji Selector example output" src="https://github.com/hokkiai/discord-emoji-selector/blob/main/assets/image.png?raw=true">
+  <br><br><a href="https://www.hokki.app"><img width="30" src="https://api.hokki.app/favicon.png"></a>
+  <br>Brought to you by the <a href="https://www.hokki.app">HokkiAI</a> team
+</div>
+<br>
+<br>
+<br>
 
 ## Installation
 
