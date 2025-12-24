@@ -14913,6 +14913,10 @@
         "char": "🅿️"
       },
       {
+        "name": "elevator",
+        "char": "🛗"
+      },
+      {
         "name": "u7a7a",
         "char": "🈳"
       },
@@ -14937,8 +14941,8 @@
         "char": "🛅"
       },
       {
-        "name": "elevator",
-        "char": "🛗"
+        "name": "wireless",
+        "char": "🛜"
       },
       {
         "name": "mens",
@@ -15231,6 +15235,10 @@
       {
         "name": "heavy_multiplication_x",
         "char": "✖️"
+      },
+      {
+        "name": "heavy_equals_sign",
+        "char": "🟰"
       },
       {
         "name": "infinity",
