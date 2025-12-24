@@ -1,7 +1,7 @@
 [
   {
     "name": "people",
-    "emojis": [ 
+    "emojis": [
       {
         "name": "grinning",
         "char": "😀"
@@ -598,7 +598,7 @@
         "name": "clap",
         "char": "👏",
         "hasTone": true,
-        "tones": [ 
+        "tones": [
           {
             "name": "clap_tone1",
             "char": "👏🏻",
@@ -14535,6 +14535,10 @@
       {
         "name": "wheel_of_dharma",
         "char": "☸️"
+      },
+      {
+        "name": "khanda",
+        "char": "🪯"
       },
       {
         "name": "star_of_david",
