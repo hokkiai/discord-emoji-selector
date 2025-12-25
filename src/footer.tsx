@@ -34,10 +34,10 @@ export default function Footer({
       />
       <div
         className="*:size-9 *:min-w-9 *:max-w-9"
-        dangerouslySetInnerHTML={{ __html: render(footerEmoji.char) }}
+        dangerouslySetInnerHTML={{ __html: render(footerEmoji?.char) }}
       />
       <p className="text-lg whitespace-nowrap overflow-hidden text-ellipsis font-gg font-semibold">
-        {(footerEmoji.name || "")
+        {(footerEmoji?.name || "")
           .split(" ")
           .map((e) => `:${e || ""}:`)
           .join(" ")}
