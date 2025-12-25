@@ -473,7 +473,7 @@ export default function EmojiSelector({
                 )}
               </Suspense>
             </div>
-            {showFooter && <Footer id={id} firstEmoji={emojis[0].emojis[0]} />}
+            {showFooter && <Footer id={id} firstEmoji={emojis[0]?.emojis[0]} />}
           </div>
         </div>
       </div>
