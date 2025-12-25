@@ -28,7 +28,7 @@ const Emoji = memo(function Emoji({
   const handleClick = useCallback(() => {
     onEmojiSelect(emoji);
   }, [emoji, onEmojiSelect]);
-  const html = useMemo(() => render(emoji.char), [emoji.char]);
+  const html = useMemo(() => render(emoji?.char || ""), [emoji?.char]);
   return (
     <div
       onMouseEnter={handleMouseEnter}
@@ -82,7 +82,7 @@ const SkinEmoji = memo(function SkinEmoji({
   const handleClick = useCallback(() => {
     onEmojiSelect(fakeEmoji);
   }, [fakeEmoji, onEmojiSelect]);
-  const html = useMemo(() => render(fakeEmoji.char), [fakeEmoji.char]);
+  const html = useMemo(() => render(fakeEmoji?.char || ""), [fakeEmoji?.char]);
   return (
     <div
       onMouseEnter={handleMouseEnter}

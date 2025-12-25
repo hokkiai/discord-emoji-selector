@@ -24,7 +24,7 @@ export default function SkinSelector({ id }: { id: string }) {
   }, []);
 
   const renderedCurrentSkin = useMemo(
-    () => render(skins[selectedTone]),
+    () => render(skins[selectedTone] || ""),
     [skins, selectedTone]
   );
 
@@ -58,7 +58,7 @@ export default function SkinSelector({ id }: { id: string }) {
               className="HOKKIEMOJIPICKER-skinselector-skinoption *:size-7 *:min-w-7 hover:bg-white/5 p-2 transition-all"
               onClick={() => handleSkinSelect(i)}
               dangerouslySetInnerHTML={{
-                __html: render(skin),
+                __html: render(skin || ""),
               }}
             />
           );

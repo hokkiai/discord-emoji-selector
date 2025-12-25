@@ -1,6 +1,6 @@
 {
   "name": "@hokkiai/discord-emoji-selector",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "A lightweight & powerful discord-style emoji picker",
   "type": "module",
   "main": "dist/index.cjs",
@@ -35,14 +35,14 @@
     "react": ">=18"
   },
   "dependencies": {
-    "@twemoji/api": "^16.0.1",
+    "@twemoji/api": "^17.0.2",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.540.0",
-    "tailwind-merge": "^3.3.1"
+    "lucide-react": "^0.562.0",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.10",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.2"
+    "@types/react": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   }
 }

@@ -1,6 +1,6 @@
 import tw from "@twemoji/api";
 
-export default function render(txt) {
+export default function render(txt: string) {
   let twemojiparsed = tw
     .parse(txt)
     .replaceAll("<img", '<img style="object-fit: cover;" loading="lazy"');
